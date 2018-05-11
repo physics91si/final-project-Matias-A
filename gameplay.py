@@ -117,7 +117,7 @@ def main(human=False, show=True, Q = 0, minefield_param = MINEFIELD_PARAM):
     mines = field.get_mines()
     squares = shape[0]*shape[1]
 
-    knowledge = np.zeros((*shape, 2))
+    knowledge = np.zeros((shape[0], shape[1], 2))
     knowledge[:,:,1] -=1
     '''knowledge is the array that is fed into the AI:
     it contains the grid twice, first just 0,1
