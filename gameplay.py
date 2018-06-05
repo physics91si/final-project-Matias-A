@@ -3,7 +3,10 @@
 import numpy as np
 import pygame
 from minefield import Minefield
-from sweeperai import eventhandler_ai, MINEFIELD_PARAM
+from sweeperai import eventhandler_ai
+import time
+
+from constants import MINEFIELD_PARAM
 
 BLACK    = (   0,   0,   0)
 GREY     = ( 127, 127, 127)
@@ -50,18 +53,9 @@ def eventhandler_human(rectdict):
                 if rect.collidepoint(click_position):
                     return click_type, coord
     return 0, (0,0)
-def maxcoord(matrix):
-    #returns the max coordinate of a 2D matrix
-    xmaxs = np.amax(matrix, axis=1)
-    maxx = np.argmax(xmaxs)
-    ymaxs = np.amax(matrix, axis=0)
-    maxy = np.argmax(ymaxs)
-    return (maxx, maxy)
-
-
-
 
 def printscreen(screen, flagged, rectangles_todraw, numbers_todraw, rectdict, mines, guessed):
+    '''Draws the objects on the screen'''
     screen.fill(WHITE)
 
     text = pygame.font.Font(None, SCOREFONT)
@@ -80,7 +74,7 @@ def printscreen(screen, flagged, rectangles_todraw, numbers_todraw, rectdict, mi
 
 
 
-def main(human=False, show=True, Q = 0, minefield_param = MINEFIELD_PARAM):
+def play(human=False, show=True, minefield_param = MINEFIELD_PARAM):
     #by default runs as computer version
     #initializes screen if "show" chosen
     if show:
@@ -117,12 +111,9 @@ def main(human=False, show=True, Q = 0, minefield_param = MINEFIELD_PARAM):
     mines = field.get_mines()
     squares = shape[0]*shape[1]
 
-    knowledge = np.zeros((shape[0], shape[1], 2))
-    knowledge[:,:,1] -=1
+    knowledge = np.full(shape,-1)
     '''knowledge is the array that is fed into the AI:
-    it contains the grid twice, first just 0,1
-    then -1, value
-    -> initially it's just 0s and -1s.
+    -1 is not guessed, otherwise the value
     '''
 
     if show:
@@ -140,29 +131,31 @@ def main(human=False, show=True, Q = 0, minefield_param = MINEFIELD_PARAM):
             if guesstype == -1:
                 done = True
         else:
-            guesstype, guesscoord = eventhandler_ai(Q, knowledge)
+            prob_mine = float(mines)/(squares-len(guessed))
+            guesstype, guesscoord = eventhandler_ai(knowledge, prob_mine, flagged)
             #guesstype, guesscoord = 1, (np.random.randint(0,shape[0]), np.random.randint(0,shape[1]))
 
         # process left click
         if guesstype == 1:
             if guesscoord in guessed:
+                '''
                 if not human:
                     lost = True
                     done = True
                     break
+                '''
                 continue
             toprocess = [guesscoord]
             while True:
                 if len(toprocess) != 0:
                     guesscoord = toprocess[0]
                     toprocess.remove(guesscoord)
-                knowledge[guesscoord,0]=1
                 if guesscoord in flagged:
                     flagged.remove(guesscoord)
 
                 guessed.append(guesscoord)
                 value = field.guess(*guesscoord)
-                knowledge[guesscoord, 1] = value
+                knowledge[guesscoord] = value
                 if value == -1:
                     lost = True
                     done = True
@@ -219,33 +212,42 @@ def main(human=False, show=True, Q = 0, minefield_param = MINEFIELD_PARAM):
     #print messages for winning and losing
     if lost and show:
         done = False
-        print("You lost!")
         text = pygame.font.Font(None, int(.3*SIZE[1]))
         image = text.render("You lost!", True, SKY_BLUE)
         screen.blit(image, (SIZE[0]/2-image.get_width()/2, SIZE[1]/2-image.get_height()/2))
-        pygame.display.flip()
+        pygame.display.update()
+        print("You lost!")
+
     elif won and show:
         done = False
-        print("You won!")
         text = pygame.font.Font(None, int(.3*SIZE[1]))
         image = text.render("You won!", True, SKY_BLUE)
         screen.blit(image, (SIZE[0]/2-image.get_width()/2, SIZE[1]/2-image.get_height()/2))
-        pygame.display.flip()
+        pygame.display.update()
+        print("You won!")
 
     # if human player, doesn't automatically close the window
+    if show:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+
     while not done and human:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
+
+    if not human and show:
+        time.sleep(1)
 
     if not human and not lost and not won:
         return -1
 
     # returns the score
     if not human:
-        return len(guessed)
+        return len(guessed), won
 
 
 
 if __name__ == "__main__":
-    main(human=True)
+    play(human=True)

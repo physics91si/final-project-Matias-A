@@ -1,61 +1,27 @@
 import numpy as np
-import gameplay
-import gym
+from constants import MINEFIELD_PARAM, MINEFIELD_SIZE
+from logic_model import use_logic
+#from square_model import use
 
-MINEFIELD_PARAM = [3]
-MINEFIELD_SIZE = [30,16]
-N = 1000
-Q = np.random.randn(30*16, 2*30*16)
-TYPE = 'RANDOM'
+'''Keras model disabled due to problems with virtual env'''
 
-def evaluate(Q = Q, show=False):
-    score = 0
-    for i in range(N):
-        newscore = gameplay.main(show = show, minefield_param = MINEFIELD_PARAM, Q = Q)
-        if newscore == -1:
-            score *= (float(N)/np.maximum(1,i))
-            break
-        score += newscore
-    return float(score)/N
+TYPE = 'LOGIC'
+LOGIC_GEN = 0
 
-def avgscore(l):
-    s = 0
-    for n in l:
-        s+=n
-    return float(s)/len(l)
+def maxcoord(matrix):
+    #returns the max coordinate of a 2D matrix
+    xmaxs = np.amax(matrix, axis=1)
+    maxx = np.argmax(xmaxs)
+    ymaxs = np.amax(matrix, axis=0)
+    maxy = np.argmax(ymaxs)
+    return (maxx, maxy)
 
-def maxscore(l):
-    m = 0
-    for n in l:
-        if n>m:
-            m=n
-    return m
-
-if __name__=='__main__':
-    print(evaluate(show=False))
-
-def eventhandler_ai(Q, knowledge):
-    # Q is (x*y, 2*x*y) numpy matrix
+def eventhandler_ai(knowledge, prob_mine, flagged):
     if TYPE=='RANDOM':
         return 1, (np.random.randint(0,knowledge.shape[0]), np.random.randint(0,knowledge.shape[1]))
-    guess = np.dot(Q, knowledge.flatten())
-    guess = guess.reshape(knowledge.shape[0], knowledge.shape[1])
-    coord = maxcoord(guess)
-    return 1, coord
-
-'''
-weights = []
-scores = []
-best = np.zeros((30*16, 2*30*16))
-
-for i in range(10000):
-     weights.append(np.random.randn(30*16, 2*30*16))
-     scores.append(evaluate(Q=weights[i]))
-     if scores[i]==maxscore(scores):
-         best = weights[i]
-     if i%500 == 0:
-         print(i)
-print("done, max " + str(maxscore(scores)))
-for i in range(10):
-    print(evaluate(Q=best))
-'''
+    if TYPE == '5x5':
+        coord = use(knowledge, prob_mine)
+        return 1,coord
+    if TYPE=='LOGIC':
+        return use_logic(knowledge, prob_mine, flagged, LOGIC_GEN)
+    return 0,(0,0)
