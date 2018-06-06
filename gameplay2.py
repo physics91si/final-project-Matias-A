@@ -5,7 +5,7 @@
 import numpy as np
 import pygame
 from minefield import Minefield
-from sweeperai import eventhandler_ai
+from sweeperai2 import eventhandler_ai
 import time
 
 from constants import MINEFIELD_PARAM

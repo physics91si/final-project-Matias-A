@@ -99,7 +99,8 @@ def use(knowledge,prob_mine,nnmodel=nnmodel):
             n += 1
 
 
-    probs = nnmodel.predict(grid[:n,:])
+    probs = nnmodel.predict(grid[:n-1,:])
     best = probs.argmin()
+
     bestcoord = dictionary[best]
     return bestcoord

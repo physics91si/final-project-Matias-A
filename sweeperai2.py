@@ -1,12 +1,12 @@
 import numpy as np
 from constants import MINEFIELD_PARAM, MINEFIELD_SIZE
 from logic_model import use_logic
-#from square_model import use
+from square_model import use
 
 '''Keras model disabled due to problems with virtual env'''
 
-TYPE = 'LOGIC'
-LOGIC_GEN = 100
+TYPE = '5x5'
+LOGIC_GEN = 2
 
 def maxcoord(matrix):
     #returns the max coordinate of a 2D matrix

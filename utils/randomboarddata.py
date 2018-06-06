@@ -17,7 +17,7 @@ def make5x5(guesses, coord, prob_mine):
             newx = i+coord[0]
             newy = j+coord[1]
             if newx<0 or newy<0 or newx>=shape[0] or newy>=shape[1]:
-                arr[i+2,j+2]=-1
+                arr[i+2,j+2]=-5
             else:
                 arr[i+2,j+2] = guesses[newx,newy]
     arr[2,2]=prob_mine

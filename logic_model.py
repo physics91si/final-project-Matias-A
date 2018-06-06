@@ -31,66 +31,25 @@ def neighbormines(c,flagged,shape):
                 i+=1
     return i
 
-'''
-def flaggedaround(coord, flagged):
-    n = 0
-    for k in range(-1,2):
-        for l in range(-1,2):
-            newx = k+coord[0]
-            newy = l+coord[1]
-            if newx<0 or newy<0 or newx>=knowledge.shape[0] or newy>=knowledge.shape[1]:
-                continue
-            if (newx,newy) in flagged:
-                n+=1
-    return n
-
-def supposemine(coord, newknowledge, flagged):
-    copy = np.copy(newknowledge)
-    for k in range(-1,2):
-        for l in range(-1,2):
-            if k==0 and l==0:
-                continue
-            newx = k+coord[0]
-            newy = l+coord[1]
-            if newx<0 or newy<0 or newx>=newknowledge.shape[0] or newy>=newknowledge.shape[1]:
-                continue
-            if newknowledge[newx,newy]==-1:
-                continue
-            if newknowledge[newx,newy]==0:
-                return False
-            copy[newx,newy]-=1
-    for k in range(-1,2):
-        for l in range(-1,2):
-            newx = k+coord[0]
-            newy = l+coord[1]
-            if newx<0 or newy<0 or newx>=newknowledge.shape[0] or newy>=newknowledge.shape[1]:
-                continue
-            if copy[newx,newy]==0:
-                for x in range(-1,2):
-                    for y in range(-1,2):
-                        newx2 = x+newx
-                        newy2 = y+newy
-                        if copy[(newx,newy)]==-1
-'''
 
 def use_logic(knowledge, prob_mine, flagged, gen):
     guessed = []
-
-    for i in range(knowledge.shape[0]):
-        for j in range(knowledge.shape[1]):
-            coord = (i,j)
-            if knowledge[coord]>0:
-                #Saves guessed coordinates
-                guessed.append(coord)
-                if neighbormines(coord,flagged,knowledge.shape)==knowledge[coord]:
-                    for k in range(-1,2):
-                        for l in range(-1,2):
-                            newx = k+coord[0]
-                            newy = l+coord[1]
-                            if newx<0 or newy<0 or newx>=knowledge.shape[0] or newy>=knowledge.shape[1]:
-                                continue
-                            if knowledge[newx,newy]==-1 and (newx,newy) not in flagged:
-                                return 1,(newx,newy)
+    if gen!=100:
+        for i in range(knowledge.shape[0]):
+            for j in range(knowledge.shape[1]):
+                coord = (i,j)
+                if knowledge[coord]>0:
+                    #Saves guessed coordinates
+                    guessed.append(coord)
+                    if neighbormines(coord,flagged,knowledge.shape)==knowledge[coord]:
+                        for k in range(-1,2):
+                            for l in range(-1,2):
+                                newx = k+coord[0]
+                                newy = l+coord[1]
+                                if newx<0 or newy<0 or newx>=knowledge.shape[0] or newy>=knowledge.shape[1]:
+                                    continue
+                                if knowledge[newx,newy]==-1 and (newx,newy) not in flagged:
+                                    return 1,(newx,newy)
 
     mines = np.zeros(knowledge.shape)
     '''Flags 100% sure mines'''
@@ -100,22 +59,7 @@ def use_logic(knowledge, prob_mine, flagged, gen):
         for m in cmines:
             if m not in flagged:
                 return 3, m
-    '''
-    if gen > 2:
-        newknowledge = np.copy(knowledge)
-        for c in guessed:
-            newknowledge[c]-=flaggedaround(c, flagged)
-        for c in guessed:
-            for k in range(-1,2):
-                for l in range(-1,2):
-                    newx = k+c[0]
-                    newy = l+c[1]
-                    if newx<0 or newy<0 or newx>=knowledge.shape[0] or newy>=knowledge.shape[1]:
-                        continue
-                    if (newx,newy) in guessed:
-                        continue
-                    works = supposemine((newx,newy),newknowledge, flagged)
-    '''
+
 
     if gen > 0:
         '''If doesn't find anything better, chooses a corner'''

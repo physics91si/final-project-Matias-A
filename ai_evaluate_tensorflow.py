@@ -1,8 +1,8 @@
-#!/usr/local/bin/python3
+#!/Users/matias/tensorflow/bin/python3
 '''Contains functions for evaluating the computer's performance'''
 
 import numpy as np
-import gameplay
+import gameplay2
 import sys
 from constants import MINEFIELD_PARAM, MINEFIELD_SIZE
 
@@ -17,7 +17,7 @@ def evaluate(show=False):
     won = 0
     scores = []
     for i in range(N_evaluate):
-        newscore, won_bool = gameplay.play(show = show, minefield_param = MINEFIELD_PARAM)
+        newscore, won_bool = gameplay2.play(show = show, minefield_param = MINEFIELD_PARAM)
         scores.append(newscore)
         if newscore == -1:
             score *= (float(N_evaluate)/np.maximum(1,i))
